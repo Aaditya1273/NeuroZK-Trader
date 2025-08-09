@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroZK Trader - AI-Driven DeFi Trading</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0118;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+            position: relative;
+        }
+
+        /* Purple wave background */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 120% 80% at 70% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 100% 60% at 20% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 50% at 90% 70%, rgba(124, 58, 237, 0.1) 0%, transparent 50%);
+            z-index: -2;
+        }
+
+        /* Animated wave overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.06) 0%, transparent 50%);
+            animation: waveFlow 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Glassmorphism Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 20px 0;
+            padding: 20px 32px;
+            box-shadow: 
+                0 8px 32px rgba(139, 92, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .logo::before {
+            content: "";
+            width: 28px;
+            height: 28px;
+            margin-right: 12px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(168, 85, 247, 0.9));
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 0 12px rgba(139, 92, 246, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+        
+        .logo::after {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 2px;
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+        }
+
+        .nav {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: -0.01em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .buy-now-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: -0.01em;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 4px 16px rgba(139, 92, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .buy-now-btn:hover {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 
+                0 8px 32px rgba(139, 92, 246, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 80px;
+            padding: 60px 0 100px;
+            min-height: calc(100vh - 160px);
+        }
+
+        .text-content {
+            z-index: 2;
+        }
+
+        .text-content h1 {
+            font-size: clamp(2.5rem, 4.5vw, 4.8rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, 
+                #ffffff 0%, 
+                #e2e8f0 30%, 
+                #a855f7 70%, 
+                #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+
+        .text-content .subtitle {
+            color: rgba(168, 85, 247, 0.9);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .text-content p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 17px;
+            line-height: 1.7;
+            margin-bottom: 40px;
+            max-width: 520px;
+            letter-spacing: -0.01em;
+        }
+
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .tag {
+            background: rgba(139, 92, 246, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            letter-spacing: -0.01em;
+            position: relative;
+            backdrop-filter: blur(20px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.8) 0%, 
+                rgba(168, 85, 247, 0.9) 100%);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 8px 32px rgba(139, 92, 246, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.9) 0%, 
+                rgba(168, 85, 247, 1) 100%);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 48px rgba(139, 92, 246, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Glassmorphism AI Robot */
+        .robot-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 600px;
+        }
+
+        .robot-glass-sphere {
+            width: 420px;
+            height: 420px;
+            background: linear-gradient(145deg, 
+                rgba(139, 92, 246, 0.15) 0%,
+                rgba(124, 58, 237, 0.25) 50%,
+                rgba(109, 40, 217, 0.15) 100%);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 
+                0 0 80px rgba(139, 92, 246, 0.2),
+                0 0 160px rgba(139, 92, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            animation: aiFloat 8s ease-in-out infinite;
+        }
+
+        /* Multiple glass rings */
+        .robot-glass-sphere::before {
+            content: "";
+            position: absolute;
+            inset: -12px;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(139, 92, 246, 0.3),
+                transparent,
+                rgba(168, 85, 247, 0.2),
+                transparent
+            );
+            animation: glassRotate 15s linear infinite;
+            z-index: -1;
+        }
+
+        .robot-glass-sphere::after {
+            content: "";
+            position: absolute;
+            inset: -24px;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 180deg,
+                transparent,
+                rgba(147, 51, 234, 0.2),
+                transparent,
+                rgba(124, 58, 237, 0.15),
+                transparent
+            );
+            animation: glassRotate 25s linear infinite reverse;
+            z-index: -1;
+        }
+
+        /* AI Brain Interface */
+        .ai-interface {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 240px;
+            height: 180px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-eyes {
+            display: flex;
+            gap: 36px;
+            margin-bottom: 20px;
+        }
+
+        .ai-eye {
+            width: 32px;
+            height: 32px;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(139, 92, 246, 1) 0%, 
+                rgba(109, 40, 217, 0.8) 70%);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 
+                0 0 24px rgba(139, 92, 246, 0.8),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            animation: aiPulse 3s ease-in-out infinite;
+        }
+
+        .ai-eye::after {
+            content: "";
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+
+        .neural-network {
+            display: flex;
+            gap: 4px;
+            opacity: 0.6;
+        }
+
+        .neural-dot {
+            width: 4px;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.8);
+            border-radius: 50%;
+            animation: neuralPulse 2s ease-in-out infinite;
+        }
+
+        .neural-dot:nth-child(2) { animation-delay: 0.3s; }
+        .neural-dot:nth-child(3) { animation-delay: 0.6s; }
+        .neural-dot:nth-child(4) { animation-delay: 0.9s; }
+        .neural-dot:nth-child(5) { animation-delay: 1.2s; }
+
+        /* Floating glass elements */
+        .glass-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .glass-particle {
+            position: absolute;
+            background: rgba(139, 92, 246, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .glass-particle:nth-child(1) {
+            width: 60px;
+            height: 60px;
+            top: 10%;
+            right: -80px;
+            animation: glassFloat1 12s ease-in-out infinite;
+        }
+
+        .glass-particle:nth-child(2) {
+            width: 40px;
+            height: 40px;
+            bottom: 15%;
+            left: -70px;
+            animation: glassFloat2 15s ease-in-out infinite;
+        }
+
+        .glass-particle:nth-child(3) {
+            width: 32px;
+            height: 32px;
+            top: 60%;
+            right: -100px;
+            animation: glassFloat3 18s ease-in-out infinite;
+        }
+
+        /* Animations */
+        @keyframes waveFlow {
+            0%, 100% { 
+                background-position: 0% 0%, 100% 100%;
+                opacity: 1;
+            }
+            50% { 
+                background-position: 100% 100%, 0% 0%;
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes aiFloat {
+            0%, 100% { 
+                transform: translateY(0px) rotateX(0deg); 
+            }
+            50% { 
+                transform: translateY(-12px) rotateX(2deg); 
+            }
+        }
+
+        @keyframes glassRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes aiPulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 24px rgba(139, 92, 246, 0.8),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 32px rgba(139, 92, 246, 1),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        @keyframes neuralPulse {
+            0%, 100% { 
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes glassFloat1 {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: translateY(-25px) rotate(180deg);
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes glassFloat2 {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.4;
+            }
+            50% { 
+                transform: translateY(-20px) rotate(-90deg);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes glassFloat3 {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.2;
+            }
+            50% { 
+                transform: translateY(-30px) rotate(90deg);
+                opacity: 0.5;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                gap: 60px;
+            }
+            
+            .robot-glass-sphere {
+                width: 350px;
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+
+            .header {
+                margin: 16px 0;
+                padding: 16px 24px;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 40px 0 60px;
+                text-align: center;
+            }
+
+            .robot-container {
+                height: 400px;
+                order: -1;
+            }
+
+            .robot-glass-sphere {
+                width: 300px;
+                height: 300px;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            .action-buttons {
+                justify-content: center;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                min-width: 200px;
+            }
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 100px 0;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 60px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            font-weight: 700;
+            color: white;
+            margin-bottom: 16px;
+            letter-spacing: -0.03em;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 
+                0 12px 48px rgba(139, 92, 246, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 24px;
+            background: rgba(139, 92, 246, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 
+                0 4px 20px rgba(139, 92, 246, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-icon::before {
+            content: "";
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(168, 85, 247, 0.9));
+            border-radius: 4px;
+            box-shadow: 
+                0 0 8px rgba(139, 92, 246, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* Specific icon styles */
+        .feature-card:nth-child(1) .feature-icon::before {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            border-radius: 50%;
+        }
+
+        .feature-card:nth-child(2) .feature-icon::before {
+            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+            border-radius: 6px;
+            transform: rotate(45deg);
+        }
+
+        .feature-card:nth-child(3) .feature-icon::before {
+            background: linear-gradient(135deg, #6d28d9, #7c3aed);
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .feature-card:nth-child(3) .feature-icon::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .feature-card:nth-child(4) .feature-icon::before {
+            background: linear-gradient(135deg, #5b21b6, #6d28d9);
+            border-radius: 8px;
+        }
+
+        .feature-card:nth-child(5) .feature-icon::before {
+            background: linear-gradient(135deg, #4c1d95, #5b21b6);
+            border-radius: 2px;
+            transform: rotate(15deg);
+        }
+
+        .feature-card:nth-child(6) .feature-icon::before {
+            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+            border-radius: 50% 50% 0 50%;
+            transform: rotate(-45deg);
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 16px;
+            letter-spacing: -0.01em;
+        }
+
+        .feature-card p {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .feature-stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: rgba(139, 92, 246, 0.15);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.05) 0%,
+                rgba(0, 0, 0, 0.3) 50%,
+                rgba(168, 85, 247, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-subtitle {
+            color: rgba(168, 85, 247, 0.9);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .about-text h2 {
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            font-weight: 700;
+            color: white;
+            margin-bottom: 24px;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .about-text p {
+            font-size: 17px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        .advantage-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: rgba(139, 92, 246, 1);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .tech-comparison h4 {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 24px;
+        }
+
+        .comparison-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .comparison-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tech-name {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .comparison-bar {
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(139, 92, 246, 1), rgba(168, 85, 247, 1));
+            border-radius: 8px;
+            transition: width 1s ease-in-out;
+        }
+
+        .percentage {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
+        }
+
+        /* Tech Stack Visual */
+        .tech-stack-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            perspective: 1000px;
+        }
+
+        .stack-layer {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .stack-layer:hover {
+            transform: translateX(8px) rotateY(5deg);
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .layer-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .layer-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(168, 85, 247, 0.9));
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 0 8px rgba(139, 92, 246, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .layer-icon::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 2px;
+        }
+
+        /* Unique styles for each layer */
+        .layer-1 .layer-icon::before {
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+        }
+
+        .layer-2 .layer-icon::before {
+            border-radius: 4px;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .layer-3 .layer-icon::before {
+            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            box-shadow: 
+                0 0 0 3px rgba(255, 255, 255, 0.3),
+                0 0 0 6px rgba(255, 255, 255, 0.1);
+        }
+
+        .layer-4 .layer-icon::before {
+            border-radius: 2px 8px 2px 8px;
+        }
+
+        .layer-5 .layer-icon::before {
+            border-radius: 50% 0 50% 0;
+            transform: translate(-50%, -50%) rotate(15deg);
+        }
+
+        .layer-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .layer-1:hover { transform: translateX(8px) rotateY(5deg); }
+        .layer-2:hover { transform: translateX(12px) rotateY(5deg); }
+        .layer-3:hover { transform: translateX(16px) rotateY(5deg); }
+        .layer-4:hover { transform: translateX(20px) rotateY(5deg); }
+        .layer-5:hover { transform: translateX(24px) rotateY(5deg); }
+
+        /* Mobile Responsive for New Sections */
+        @media (max-width: 768px) {
+            .features-section {
+                padding: 60px 0;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .about-section {
+                padding: 60px 0;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .advantage-stats {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .tech-stack-visual {
+                max-width: 300px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">NeuroZK Trader</div>
+            <nav class="nav">
+                <a href="#features">Features</a>
+                <a href="#trading">Trading</a>
+                <a href="#security">Security</a>
+                <a href="#api">API</a>
+            </nav>
+            <a href="#" class="buy-now-btn">Launch App</a>
+        </header>
+
+        <main class="main-content">
+            <div class="text-content">
+                <div class="subtitle">AI-Driven DeFi Revolution</div>
+                <h1>Shape a New Era of Finance</h1>
+                <p>An <strong>AI-driven, zero-knowledge, MEV-proof smart account</strong> for autonomous DeFi trading & asset management, directly integrated with the <strong>OKX DEX API</strong> and XLayer.</p>
+                
+                <div class="feature-tags">
+                    <span class="tag">Zero-Knowledge</span>
+                    <span class="tag">MEV-Proof</span>
+                    <span class="tag">AI-Driven</span>
+                    <span class="tag">OKX DEX</span>
+                    <span class="tag">XLayer</span>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="#" class="btn btn-primary">Start Trading</a>
+                    <a href="#" class="btn btn-secondary">View Demo</a>
+                </div>
+            </div>
+
+            <div class="robot-container">
+                <div class="robot-glass-sphere">
+                    <div class="ai-interface">
+                        <div class="ai-eyes">
+                            <div class="ai-eye"></div>
+                            <div class="ai-eye"></div>
+                        </div>
+                        <div class="neural-network">
+                            <div class="neural-dot"></div>
+                            <div class="neural-dot"></div>
+                            <div class="neural-dot"></div>
+                            <div class="neural-dot"></div>
+                            <div class="neural-dot"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-particles">
+                    <div class="glass-particle"></div>
+                    <div class="glass-particle"></div>
+                    <div class="glass-particle"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <div class="section-header">
+                <h2>Revolutionary DeFi Technology Stack</h2>
+                <p>Combining cutting-edge AI, zero-knowledge proofs, and MEV protection in one unified platform</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Autonomous AI Agent</h3>
+                    <p>Learns trading patterns from on-chain & OKX DEX market data, executes trades using session keys (ERC-4337) without constant wallet signing, and adjusts risk levels dynamically.</p>
+                    <div class="feature-stats">
+                        <span class="stat">24/7 Trading</span>
+                        <span class="stat">Auto Risk Management</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>ZK-Proof Trade Receipts</h3>
+                    <p>All trades verified with zkSNARK proofs. Users can prove correct execution without revealing strategy, ensuring complete privacy and verifiable transparency.</p>
+                    <div class="feature-stats">
+                        <span class="stat">Zero-Knowledge</span>
+                        <span class="stat">Verifiable Proofs</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>MEV Shield Layer</h3>
+                    <p>Routes orders via private relays with Flashbots-style protection. Randomized transaction timings and batching reduce sandwich attacks by up to 95%.</p>
+                    <div class="feature-stats">
+                        <span class="stat">95% MEV Protection</span>
+                        <span class="stat">Private Relays</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Social Recovery System</h3>
+                    <p>Multi-device keys with social recovery options. Lost device? Recover your smart account via trusted friends or devices with cryptographic security.</p>
+                    <div class="feature-stats">
+                        <span class="stat">Multi-Device</span>
+                        <span class="stat">Social Recovery</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>OKX + XLayer Integration</h3>
+                    <p>Trades settle on OKX DEX liquidity for speed, bridged to XLayer for scaling. Seamless cross-chain operations with minimal fees.</p>
+                    <div class="feature-stats">
+                        <span class="stat">Cross-Chain</span>
+                        <span class="stat">Low Fees</span>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Smart Account (ERC-4337)</h3>
+                    <p>Advanced account abstraction with programmable logic, batch transactions, and gas optimization. No seed phrases, just intelligent automation.</p>
+                    <div class="feature-stats">
+                        <span class="stat">Account Abstraction</span>
+                        <span class="stat">Gas Optimized</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about-section">
+            <div class="about-content">
+                <div class="about-text">
+                    <div class="section-subtitle">The Future of DeFi</div>
+                    <h2>Why NeuroZK Trader Changes Everything</h2>
+                    <p>We've created the world's first fully integrated AI-driven, zero-knowledge, MEV-proof smart account. While competitors focus on single features, we've built the complete stack that DeFi traders actually need.</p>
+                    
+                    <div class="advantage-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">78-82%</div>
+                            <div class="stat-label">Win Probability vs Competition</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">0%</div>
+                            <div class="stat-label">Competitors with Full Stack</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">7</div>
+                            <div class="stat-label">Integrated Technologies</div>
+                        </div>
+                    </div>
+
+                    <div class="tech-comparison">
+                        <h4>Technology Stack Comparison</h4>
+                        <div class="comparison-grid">
+                            <div class="comparison-item">
+                                <span class="tech-name">ERC-4337 Smart Accounts</span>
+                                <div class="comparison-bar">
+                                    <div class="bar-fill" style="width: 100%"></div>
+                                    <span class="percentage">100% (Us) vs 28% (Others)</span>
+                                </div>
+                            </div>
+                            <div class="comparison-item">
+                                <span class="tech-name">AI Integration</span>
+                                <div class="comparison-bar">
+                                    <div class="bar-fill" style="width: 100%"></div>
+                                    <span class="percentage">100% (Us) vs 14% (Others)</span>
+                                </div>
+                            </div>
+                            <div class="comparison-item">
+                                <span class="tech-name">ZK-Proof Privacy</span>
+                                <div class="comparison-bar">
+                                    <div class="bar-fill" style="width: 100%"></div>
+                                    <span class="percentage">100% (Us) vs 19% (Others)</span>
+                                </div>
+                            </div>
+                            <div class="comparison-item">
+                                <span class="tech-name">MEV-Resistance</span>
+                                <div class="comparison-bar">
+                                    <div class="bar-fill" style="width: 100%"></div>
+                                    <span class="percentage">100% (Us) vs 5% (Others)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-visual">
+                    <div class="tech-stack-visual">
+                        <div class="stack-layer layer-1">
+                            <div class="layer-content">
+                                <div class="layer-icon"></div>
+                                <span class="layer-name">AI Layer</span>
+                            </div>
+                        </div>
+                        <div class="stack-layer layer-2">
+                            <div class="layer-content">
+                                <div class="layer-icon"></div>
+                                <span class="layer-name">ZK Privacy</span>
+                            </div>
+                        </div>
+                        <div class="stack-layer layer-3">
+                            <div class="layer-content">
+                                <div class="layer-icon"></div>
+                                <span class="layer-name">MEV Protection</span>
+                            </div>
+                        </div>
+                        <div class="stack-layer layer-4">
+                            <div class="layer-content">
+                                <div class="layer-icon"></div>
+                                <span class="layer-name">Smart Accounts</span>
+                            </div>
+                        </div>
+                        <div class="stack-layer layer-5">
+                            <div class="layer-content">
+                                <div class="layer-icon"></div>
+                                <span class="layer-name">OKX + XLayer</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

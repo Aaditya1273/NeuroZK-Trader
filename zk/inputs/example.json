@@ -1,0 +1,14 @@
+{
+  "strategyCommitment": "0",
+  "refPrice": "50000000",
+  "executedPrice": "49950000",
+  "size": "2000000",
+  "signalDirection": "0",
+  "minSize": "1000000",
+  "maxSize": "5000000",
+  "maxSlippageBps": "100",
+  "allowedBandBps": "150",
+  "secretSalt": "1",
+  "k1": "123456",
+  "k2": "9999"
+}

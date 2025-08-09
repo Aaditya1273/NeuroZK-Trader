@@ -1,0 +1,139 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  contracts:
+    name: Compile & Test Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install deps
+        run: |
+          npm ci || npm install
+
+      - name: Compile
+        run: |
+          npx hardhat compile
+
+      - name: Test
+        run: |
+          npx hardhat test --reporter spec
+
+  deploy:
+    name: Deploy to Testnet
+    needs: contracts
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    env:
+      SEPOLIA_RPC_URL: ${{ secrets.RPC_URL }}
+      DEPLOYER_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install deps
+        run: |
+          npm ci || npm install
+
+      - name: Deploy
+        run: |
+          # Expect a deployment script present, e.g., scripts/deploy.js or deployBridge.js
+          # Override via env WORKFLOW_DEPLOY_SCRIPT if needed
+          DEPLOY_SCRIPT=${WORKFLOW_DEPLOY_SCRIPT:-scripts/deployBridge.js}
+          if [ -f "$DEPLOY_SCRIPT" ]; then
+            npx hardhat run $DEPLOY_SCRIPT --network sepolia || npx hardhat run $DEPLOY_SCRIPT
+          else
+            echo "No deploy script found at $DEPLOY_SCRIPT. Skipping."
+          fi
+
+  ai-check:
+    name: AI Core Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install AI requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ai/requirements.txt
+
+      - name: Import smoke
+        run: |
+          python - << 'PY'
+          from ai.core import OKXConfig, ModelConfig
+          print('AI core import OK')
+          PY
+
+  docker:
+    name: Build & Push Docker Images
+    needs: [contracts, ai-check]
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push MEV Router
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/mev-router.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/mev-router:latest
+            ghcr.io/${{ github.repository }}/mev-router:${{ github.sha }}
+
+      - name: Build & Push AI Service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/ai.Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/ai:latest
+            ghcr.io/${{ github.repository }}/ai:${{ github.sha }}
