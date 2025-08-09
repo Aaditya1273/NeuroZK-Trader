@@ -8,7 +8,18 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node", "jest"]
+    "types": [
+      "node",
+      "jest",
+      "hardhat",
+      "@nomicfoundation/hardhat-chai-matchers"
+    ]
   },
-  "include": ["./src/**/*", "./tests/**/*"]
+  "include": [
+    "./src/**/*",
+    "./tests/**/*",
+    "./test/**/*",
+    "./scripts/**/*",
+    "./contracts/**/*"
+  ]
 }

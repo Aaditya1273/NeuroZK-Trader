@@ -5,7 +5,9 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "test:okx": "jest --verbose --runTestsByPath tests/okx/client.test.ts tests/okx/orders.test.ts"
+    "test:okx": "jest --verbose --runTestsByPath tests/okx/client.test.ts tests/okx/orders.test.ts",
+    "test:contracts": "npx hardhat test",
+    "ws:feeder": "node scripts/ws/feeder.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
