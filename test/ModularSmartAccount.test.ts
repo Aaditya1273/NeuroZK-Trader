@@ -17,12 +17,12 @@ describe("ModularSmartAccount", function () {
     expect(await msa.isSessionKeyValid(sessionKey.address)).to.eq(false);
 
     // Add session key for 1 hour
-    await expect(msa.connect(owner)['addSessionKey(address,uint64)'](sessionKey.address, 3600 * 1000))
+    await expect(msa.connect(owner).addSessionKey(sessionKey.address, 3600 * 1000))
       .to.emit(msa, "SessionKeyAdded");
     expect(await msa.isSessionKeyValid(sessionKey.address)).to.eq(true);
 
     // Revoke
-    await expect(msa.connect(owner)['revokeSessionKey(address)'](sessionKey.address))
+    await expect(msa.connect(owner).revokeSessionKey(sessionKey.address))
       .to.emit(msa, "SessionKeyRevoked");
     expect(await msa.isSessionKeyValid(sessionKey.address)).to.eq(false);
   });

@@ -42,6 +42,7 @@ setInterval(() => {
     ts: Date.now(),
   });
 }, 4000);
+process.env.WS_PORT = process.env.WS_PORT || '8080';
 
 setInterval(() => {
   // health: { type: 'health', bundlerBacklog, accountStatus, balance }

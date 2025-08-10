@@ -8,6 +8,7 @@
 **/.turbo/
 frontend/dashboard/.vite/
 frontend/dashboard/.cache/
+frontend/dashboard/.nyc_output/
 
 # Hardhat / Solidity
 artifacts/
@@ -20,6 +21,18 @@ coverage/
 .env.*
 !.env.examples
 session_keys/
+
+# Frontend (Vite) environment files
+frontend/dashboard/.env
+frontend/dashboard/.env.*
+!frontend/dashboard/.env.example
+!frontend/dashboard/.env.examples
+
+# Tool caches
+.eslintcache
+.coverage/
+.nyc_output/
+*.tsbuildinfo
 
 # ZK artifacts & keys
 zk/build/

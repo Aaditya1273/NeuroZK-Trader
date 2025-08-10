@@ -13,9 +13,13 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: auto;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: #0a0118;
+            background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 50%, #16213e 100%);
             min-height: 100vh;
             overflow-x: hidden;
             color: white;
@@ -31,9 +35,10 @@
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(ellipse 120% 80% at 70% 20%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse 100% 60% at 20% 80%, rgba(168, 85, 247, 0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 80% 50% at 90% 70%, rgba(124, 58, 237, 0.1) 0%, transparent 50%);
+                radial-gradient(ellipse 120% 80% at 70% 20%, rgba(147, 51, 234, 0.4) 0%, transparent 50%),
+                radial-gradient(ellipse 100% 60% at 20% 80%, rgba(168, 85, 247, 0.35) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 50% at 90% 70%, rgba(124, 58, 237, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse 150% 100% at 50% 0%, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
             z-index: -2;
         }
 
@@ -46,8 +51,9 @@
             right: 0;
             bottom: 0;
             background-image: 
-                radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.06) 0%, transparent 50%);
+                radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.18) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
             animation: waveFlow 20s ease-in-out infinite;
             z-index: -1;
         }
@@ -84,27 +90,32 @@
             font-size: 20px;
             font-weight: 700;
             letter-spacing: -0.02em;
+            position: relative;
+            padding-left: 44px; /* space for the logo square */
         }
 
         .logo::before {
             content: "";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
             width: 28px;
             height: 28px;
-            margin-right: 12px;
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(168, 85, 247, 0.9));
             border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 
                 0 0 12px rgba(139, 92, 246, 0.4),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            position: relative;
         }
         
         .logo::after {
             content: "";
             position: absolute;
-            left: 8px;
-            top: 8px;
+            left: 26px; /* centered inside the purple square */
+            top: 50%;
+            transform: translate(-50%, -50%);
             width: 12px;
             height: 12px;
             background: rgba(255, 255, 255, 0.9);
@@ -227,6 +238,36 @@
             font-size: 12px;
             font-weight: 500;
             letter-spacing: 0.01em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .tag:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
+            color: white;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 
+                0 8px 20px rgba(139, 92, 246, 0.3),
+                0 0 15px rgba(139, 92, 246, 0.2);
+            animation: tagPulse 1.5s ease-in-out infinite;
+        }
+
+        .tag:hover::before {
+            left: 100%;
         }
 
         .action-buttons {
@@ -239,13 +280,32 @@
             border-radius: 16px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             cursor: pointer;
             font-size: 16px;
             letter-spacing: -0.01em;
             position: relative;
             backdrop-filter: blur(20px);
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            transition: all 0.6s ease;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-primary {
@@ -263,10 +323,12 @@
             background: linear-gradient(135deg, 
                 rgba(139, 92, 246, 0.9) 0%, 
                 rgba(168, 85, 247, 1) 100%);
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.05);
             box-shadow: 
                 0 12px 48px rgba(139, 92, 246, 0.4),
+                0 0 30px rgba(139, 92, 246, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            animation: buttonPulse 2s ease-in-out infinite;
         }
 
         .btn-secondary {
@@ -281,7 +343,12 @@
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 
+                0 8px 32px rgba(255, 255, 255, 0.1),
+                0 0 20px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            animation: buttonGlow 2s ease-in-out infinite;
         }
 
         /* Glassmorphism AI Robot */
@@ -377,13 +444,13 @@
             width: 32px;
             height: 32px;
             background: radial-gradient(circle at 30% 30%, 
-                rgba(139, 92, 246, 1) 0%, 
-                rgba(109, 40, 217, 0.8) 70%);
+                rgba(139, 92, 246, 0.6) 0%, 
+                rgba(109, 40, 217, 0.4) 70%);
             border-radius: 50%;
             position: relative;
             box-shadow: 
-                0 0 24px rgba(139, 92, 246, 0.8),
-                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+                0 0 12px rgba(139, 92, 246, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1);
             animation: aiPulse 3s ease-in-out infinite;
         }
 
@@ -394,9 +461,9 @@
             left: 6px;
             width: 6px;
             height: 6px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.6);
             border-radius: 50%;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.4);
         }
 
         .neural-network {
@@ -541,6 +608,116 @@
             }
         }
 
+        @keyframes shimmerSweep {
+            0% {
+                transform: rotate(45deg) translate(-100%, -100%);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(45deg) translate(100%, 100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 
+                    inset 0 8px 20px rgba(0, 0, 0, 0.6),
+                    inset 0 4px 10px rgba(0, 0, 0, 0.4),
+                    inset 0 0 20px rgba(139, 92, 246, 0.4),
+                    inset 0 0 40px rgba(168, 85, 247, 0.2),
+                    0 2px 8px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 
+                    inset 0 8px 20px rgba(0, 0, 0, 0.6),
+                    inset 0 4px 10px rgba(0, 0, 0, 0.4),
+                    inset 0 0 30px rgba(139, 92, 246, 0.6),
+                    inset 0 0 60px rgba(168, 85, 247, 0.4),
+                    0 2px 8px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        @keyframes iconBounce {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.1); }
+            60% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes iconGlow {
+            0%, 100% {
+                box-shadow: 
+                    0 4px 20px rgba(139, 92, 246, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    0 4px 30px rgba(139, 92, 246, 0.4),
+                    0 0 20px rgba(139, 92, 246, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        @keyframes textShimmer {
+            0%, 100% {
+                color: white;
+                text-shadow: none;
+            }
+            50% {
+                color: rgba(139, 92, 246, 0.9);
+                text-shadow: 
+                    0 0 10px rgba(139, 92, 246, 0.5),
+                    0 0 20px rgba(139, 92, 246, 0.3);
+            }
+        }
+
+        @keyframes buttonPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 12px 48px rgba(139, 92, 246, 0.4),
+                    0 0 30px rgba(139, 92, 246, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 
+                    0 12px 48px rgba(139, 92, 246, 0.6),
+                    0 0 40px rgba(139, 92, 246, 0.5),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        @keyframes buttonGlow {
+            0%, 100% {
+                box-shadow: 
+                    0 8px 32px rgba(255, 255, 255, 0.1),
+                    0 0 20px rgba(255, 255, 255, 0.05),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            }
+            50% {
+                box-shadow: 
+                    0 8px 32px rgba(255, 255, 255, 0.15),
+                    0 0 30px rgba(255, 255, 255, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        @keyframes tagPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 8px 20px rgba(139, 92, 246, 0.3),
+                    0 0 15px rgba(139, 92, 246, 0.2);
+            }
+            50% {
+                box-shadow: 
+                    0 8px 25px rgba(139, 92, 246, 0.4),
+                    0 0 20px rgba(139, 92, 246, 0.3);
+            }
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .main-content {
@@ -639,19 +816,57 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
             padding: 32px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 
                 0 8px 32px rgba(0, 0, 0, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(139, 92, 246, 0.1),
+                transparent
+            );
+            transform: rotate(45deg) translate(-100%, -100%);
+            transition: transform 0.6s ease;
+            opacity: 0;
+        }
+
+        .feature-card:hover::before {
+            transform: rotate(45deg) translate(0%, 0%);
+            opacity: 1;
+            animation: shimmerSweep 0.8s ease-out;
         }
 
         .feature-card:hover {
-            transform: translateY(-4px);
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(139, 92, 246, 0.3);
+            transform: scale(0.98);
+            background: rgba(0, 0, 0, 0.4);
+            border-color: rgba(139, 92, 246, 0.6);
             box-shadow: 
-                0 12px 48px rgba(139, 92, 246, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                inset 0 8px 20px rgba(0, 0, 0, 0.6),
+                inset 0 4px 10px rgba(0, 0, 0, 0.4),
+                inset 0 0 20px rgba(139, 92, 246, 0.4),
+                inset 0 0 40px rgba(168, 85, 247, 0.2),
+                0 2px 8px rgba(0, 0, 0, 0.3);
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        .feature-card:hover .feature-icon {
+            animation: iconBounce 0.6s ease-out, iconGlow 2s ease-in-out infinite;
+        }
+
+        .feature-card:hover h3 {
+            animation: textShimmer 1.5s ease-in-out infinite;
         }
 
         .feature-icon {
@@ -972,6 +1187,11 @@
         .layer-4:hover { transform: translateX(20px) rotateY(5deg); }
         .layer-5:hover { transform: translateX(24px) rotateY(5deg); }
 
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
         /* Mobile Responsive for New Sections */
         @media (max-width: 768px) {
             .features-section {
@@ -1010,12 +1230,11 @@
         <header class="header">
             <div class="logo">NeuroZK Trader</div>
             <nav class="nav">
-                <a href="#features">Features</a>
-                <a href="#trading">Trading</a>
-                <a href="#security">Security</a>
-                <a href="#api">API</a>
+                <a href="#smart-accounts">Smart Accounts</a>
+                <a href="#zk-proofs">ZK Proofs</a>
+                <a href="#ai-trading">AI Trading</a>
             </nav>
-            <a href="#" class="buy-now-btn">Launch App</a>
+            <a href="/" class="buy-now-btn">Launch App</a>
         </header>
 
         <main class="main-content">
@@ -1033,8 +1252,8 @@
                 </div>
 
                 <div class="action-buttons">
-                    <a href="#" class="btn btn-primary">Start Trading</a>
-                    <a href="#" class="btn btn-secondary">View Demo</a>
+                    <a class="btn btn-primary" href="/">Open Dashboard</a>
+                    <a class="btn btn-secondary" href="https://github.com/Aaditya1273/NeuroZK-Trader#readme" target="_blank" rel="noopener">Read More</a>
                 </div>
             </div>
 
@@ -1063,14 +1282,14 @@
         </main>
 
         <!-- Features Section -->
-        <section class="features-section">
+        <section class="features-section" id="smart-accounts">
             <div class="section-header">
                 <h2>Revolutionary DeFi Technology Stack</h2>
                 <p>Combining cutting-edge AI, zero-knowledge proofs, and MEV protection in one unified platform</p>
             </div>
             
             <div class="features-grid">
-                <div class="feature-card">
+                <div class="feature-card" id="ai-trading">
                     <div class="feature-icon"></div>
                     <h3>Autonomous AI Agent</h3>
                     <p>Learns trading patterns from on-chain & OKX DEX market data, executes trades using session keys (ERC-4337) without constant wallet signing, and adjusts risk levels dynamically.</p>
@@ -1080,7 +1299,7 @@
                     </div>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card" id="zk-proofs">
                     <div class="feature-icon"></div>
                     <h3>ZK-Proof Trade Receipts</h3>
                     <p>All trades verified with zkSNARK proofs. Users can prove correct execution without revealing strategy, ensuring complete privacy and verifiable transparency.</p>
@@ -1227,5 +1446,32 @@
             </div>
         </section>
     </div>
+
+    <script>
+        // Fix auto-scroll issue on page refresh
+        window.addEventListener('beforeunload', function() {
+            window.scrollTo(0, 0);
+        });
+
+        // Ensure page starts at top on load
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 0);
+        });
+
+        // Additional fix for browser back/forward navigation
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                window.scrollTo(0, 0);
+            }
+        });
+
+        // Immediate scroll to top
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+    </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "./SmartAccount.sol";
-import "erc4337/core/EntryPoint.sol";
+import "@account-abstraction/contracts/core/EntryPoint.sol";
 
 /**
  * @title SmartAccountFactory

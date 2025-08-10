@@ -2,8 +2,8 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import "erc4337/core/BaseAccount.sol";
-import "erc4337/core/EntryPoint.sol";
+import "@account-abstraction/contracts/core/BaseAccount.sol";
+import "@account-abstraction/contracts/core/EntryPoint.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
