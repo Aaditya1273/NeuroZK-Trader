@@ -3,6 +3,12 @@
 ![License](https://img.shields.io/badge/license-MIT-green) ![Node](https://img.shields.io/badge/node-%3E=20.x-339933?logo=node.js&logoColor=white) ![Hardhat](https://img.shields.io/badge/Hardhat-Contracts-f7df1e?logo=ethereum&logoColor=black) ![Vite](https://img.shields.io/badge/Vite-React-646CFF?logo=vite&logoColor=white)
 
 Modular ERC-4337 smart account with session keys and social recovery, ZK-verified trade pipeline, MEV-resistant routing, OKX integration, AI backtesting, and a live dashboard.
+## Images
+<img width="1901" height="877" alt="Screenshot 2025-08-10 235528" src="https://github.com/user-attachments/assets/ecf6150a-f721-4be5-8e11-2feaf257fa62" />
+<img width="1891" height="872" alt="Screenshot 2025-08-10 235556" src="https://github.com/user-attachments/assets/3b594fb0-826d-4ba1-9ab7-17e93a7ae7ee" />
+<img width="1918" height="974" alt="Screenshot 2025-08-10 235947" src="https://github.com/user-attachments/assets/a5c72717-4e19-4ba8-a8e0-e07b34a08c5f" />
+<img width="1917" height="879" alt="Screenshot 2025-08-11 000016" src="https://github.com/user-attachments/assets/a1111a5d-ccbd-485e-99b3-c2ef30d0ac66" />
+
 
 ## 🧭 Overview
 
