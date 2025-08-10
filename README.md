@@ -1,6 +1,22 @@
-# NeuroZK-Trader
+# ⚡ NeuroZK‑Trader
+
+![License](https://img.shields.io/badge/license-MIT-green) ![Node](https://img.shields.io/badge/node-%3E=20.x-339933?logo=node.js&logoColor=white) ![Hardhat](https://img.shields.io/badge/Hardhat-Contracts-f7df1e?logo=ethereum&logoColor=black) ![Vite](https://img.shields.io/badge/Vite-React-646CFF?logo=vite&logoColor=white)
 
 Modular ERC-4337 smart account with session keys and social recovery, ZK-verified trade pipeline, MEV-resistant routing, OKX integration, AI backtesting, and a live dashboard.
+
+## 🔗 Quick Links
+
+- ▶️ [Overview](#overview)
+- 🚀 [Quick Start](#quick-start)
+- 🔧 [Environment](#environment)
+- 🧩 [Contracts](#contracts)
+- 🛡️ [Session Keys](#session-keys)
+- 🧪 [Tests](#tests)
+- 🧠 [AI Core & Backtesting](#ai-core--backtesting)
+- 🧮 [ZK (Circom)](#zk-circom)
+- 🧭 [Example Scenario](#example-scenario)
+- 🖥️ [Live Demo](#live-demo-for-judges)
+- 🧰 [Pro Guide](#pro-guide-architecture-workflow--ops)
 
 ## Overview
 
