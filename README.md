@@ -4,20 +4,6 @@
 
 Modular ERC-4337 smart account with session keys and social recovery, ZK-verified trade pipeline, MEV-resistant routing, OKX integration, AI backtesting, and a live dashboard.
 
-## 🔗 Quick Links
-
-- ▶️ [Overview](#overview)
-- 🚀 [Quick Start](#quick-start)
-- 🔧 [Environment](#environment)
-- 🧩 [Contracts](#contracts)
-- 🛡️ [Session Keys](#session-keys)
-- 🧪 [Tests](#tests)
-- 🧠 [AI Core & Backtesting](#ai-core--backtesting)
-- 🧮 [ZK (Circom)](#zk-circom)
-- 🧭 [Example Scenario](#example-scenario)
-- 🖥️ [Live Demo](#live-demo-for-judges)
-- 🧰 [Pro Guide](#pro-guide-architecture-workflow--ops)
-
 ## Overview
 
 NeuroZK-Trader is a modular Web3 trading stack that unifies:
@@ -28,6 +14,72 @@ NeuroZK-Trader is a modular Web3 trading stack that unifies:
 - OKX DEX integration for liquidity
 - AI backtesting/predictions
 - Live React dashboard with WebSocket feeds
+
+## 🗺️ Workflow (Mermaid)
+
+Visual overview of the request → analysis → execution → streaming loop.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant FE as Frontend (Vite/React)
+    participant WS as WS Feeder (Node)
+    participant AI as AI Engine
+    participant BC as Blockchain (RPC)
+    participant OKX as OKX API
+    participant ZK as ZK Prover
+
+    U->>FE: Open Dashboard / Trigger Analysis
+    FE->>WS: Connect (VITE_WS_URL)
+    WS-->>FE: Live logs (terminal view)
+
+    FE->>AI: Create Trade Intent (constraints)
+    AI->>ZK: Generate Proof (policy checks)
+    ZK-->>AI: Proof + public inputs
+    AI->>FE: Intent + Proof
+
+    FE->>BC: Build UserOp (session key)
+    BC-->>FE: Validation (EntryPoint)
+    FE->>OKX: Route/Execute (private relay/MEV-safe)
+    OKX-->>FE: Tx/Order result
+    FE-->>WS: Emit status lines
+    WS-->>FE: Streamed output for UI
+```
+
+### 🧭 Module Map
+
+```mermaid
+flowchart LR
+  subgraph UI[Frontend: Vite/React]
+    A[Wallet Modal\nGlassmorphism]-->T[Terminal Analysis\nMonospace <pre> + LIVE]
+  end
+
+  subgraph Node[Node Scripts]
+    P[ws/pipe.js\nHardhat -> WS]
+    S[scripts/session/*\nAdd/Revoke SK]
+  end
+
+  subgraph Contracts[Solidity]
+    MSA[ModularSmartAccount]
+    EP[EntryPoint]
+  end
+
+  subgraph ZK[Circom]
+    C[Circuits]
+  end
+
+  subgraph AI[ai/]
+    G[Signals / Backtests]
+  end
+
+  UI---P
+  P-. WS .-UI
+  UI---G
+  G---C
+  UI---MSA
+  MSA---EP
+```
 
 ### The Problem in Web3
 
