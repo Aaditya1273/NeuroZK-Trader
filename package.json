@@ -8,6 +8,8 @@
     "test:okx": "jest --verbose --runTestsByPath tests/okx/client.test.ts tests/okx/orders.test.ts",
     "test:contracts": "npx hardhat test",
     "test:contracts:ts": "cross-env HARDHAT_DISABLE_TELEMETRY=1 NODE_OPTIONS=\"--require ts-node/register/transpile-only\" hardhat test --show-stack-traces --bail",
+    "demo:contracts": "cross-env HARDHAT_DISABLE_TELEMETRY=1 NODE_OPTIONS=\"--require ts-node/register/transpile-only\" hardhat test test/ModularSmartAccount.test.ts --show-stack-traces",
+    "demo:okx": "jest --config jest.config.js --verbose --runTestsByPath tests/okx/client.test.ts tests/okx/orders.test.ts",
     "ws:feeder": "node scripts/ws/feeder.js"
   },
   "devDependencies": {

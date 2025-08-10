@@ -17,7 +17,12 @@ export function createWS(url: string, onMessage: (msg: WSMessage) => void) {
     ws.onmessage = (ev) => {
       try {
         const data = JSON.parse(ev.data)
-        onMessage(data)
+        // Normalize to always have a payload wrapper so components can rely on msg.payload
+        // If server already sends { type, payload }, pass through. Otherwise, wrap all fields under payload.
+        const msg = (data && typeof data === 'object' && 'payload' in data)
+          ? data
+          : { type: data?.type ?? 'unknown', payload: { ...data } }
+        onMessage(msg as WSMessage)
       } catch {}
     }
     ws.onclose = () => {

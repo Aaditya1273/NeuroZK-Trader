@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { createWS, WSMessage } from '../lib/ws'
 
 export type TradeRow = {
@@ -14,6 +14,7 @@ export type TradeRow = {
 
 export function TradeHistory() {
   const [rows, setRows] = useState<TradeRow[]>([])
+  const scrollRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const url = import.meta.env.VITE_WS_URL as string | undefined
@@ -41,9 +42,21 @@ export function TradeHistory() {
     <div className="rounded-xl border border-white/10 bg-white/60 dark:bg-black/30 backdrop-blur p-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Trade History</h2>
-        <span className="text-xs opacity-70">ZK-verified</span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="text-xs px-2 py-1 rounded bg-white/30 dark:bg-white/10 hover:bg-white/40"
+            title="Scroll to top"
+          >Top</button>
+          <button
+            onClick={() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })}
+            className="text-xs px-2 py-1 rounded bg-white/30 dark:bg-white/10 hover:bg-white/40"
+            title="Scroll to bottom"
+          >Bottom</button>
+          <span className="text-xs opacity-70">ZK-verified</span>
+        </div>
       </div>
-      <div className="mt-3 overflow-x-auto">
+      <div ref={scrollRef} className="mt-3 overflow-x-auto overflow-y-auto max-h-72 rounded-lg">
         <table className="min-w-full text-sm">
           <thead className="text-left opacity-70">
             <tr>

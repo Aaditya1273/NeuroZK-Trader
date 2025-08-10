@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Header } from './components/Header'
-import { Predictions } from './components/Predictions'
-import { TradeHistory } from './components/TradeHistory'
 import { AccountHealth } from './components/AccountHealth'
-import { useAuth } from './context/AuthContext'
-import { Login } from './components/Login.tsx'
 import { WalletOverview } from './components/WalletOverview'
+import { Analysis } from './components/Analysis'
 
 export default function App() {
   const [dark, setDark] = useState(true)
-  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
     const root = document.documentElement
@@ -17,23 +13,20 @@ export default function App() {
     else root.classList.remove('dark')
   }, [dark])
 
-  if (!isAuthenticated) {
-    return <Login />
-  }
-
   return (
     <div className="min-h-screen">
       <Header dark={dark} setDark={setDark} />
-      <main className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <section className="lg:col-span-2">
-          <Predictions />
-          <div className="mt-6">
-            <TradeHistory />
+      <main className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section className="lg:col-span-2 space-y-6">
+          <div className="glass-card neon-border glass-hover shimmer anim-slide-in anim-delay-1 p-4">
+            <Analysis />
           </div>
         </section>
         <aside className="lg:col-span-1">
           <div className="space-y-6">
-            <WalletOverview />
+            <div className="glass-card neon-border glass-hover shimmer anim-slide-in anim-delay-2 p-4">
+              <WalletOverview />
+            </div>
             <AccountHealth />
           </div>
         </aside>

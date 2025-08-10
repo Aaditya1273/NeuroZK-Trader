@@ -34,13 +34,13 @@ export function AccountHealth() {
   const color = status === 'ok' ? 'text-emerald-400' : status === 'warn' ? 'text-amber-400' : 'text-rose-400'
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/60 dark:bg-black/30 backdrop-blur p-4">
-      <h2 className="text-lg font-semibold">Account Health</h2>
+    <div className="glass-card neon-border glass-hover shimmer anim-slide-in anim-delay-2 p-5">
+      <h2 className="text-lg font-semibold heading-gradient">Account Health</h2>
       <div className="mt-3 space-y-2 text-sm">
         <div className="flex items-center justify-between">
           <span className="opacity-70">Status</span>
           <span className={color + ' inline-flex items-center gap-2'}>
-            <span className={`w-2 h-2 rounded-full ${status === 'ok' ? 'bg-emerald-400' : status === 'warn' ? 'bg-amber-400' : 'bg-rose-400'} animate-pulse`} />
+            <span className={`pulse-dot ${status === 'ok' ? '!bg-emerald-400' : status === 'warn' ? '!bg-amber-400' : '!bg-rose-400'}`} />
             {status.toUpperCase()}
           </span>
         </div>

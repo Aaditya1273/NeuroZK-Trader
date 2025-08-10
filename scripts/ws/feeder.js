@@ -54,4 +54,15 @@ setInterval(() => {
   });
 }, 5000);
 
-wss.on('connection', () => console.log('[ws-feeder] client connected'));
+wss.on('connection', (socket) => {
+  console.log('[ws-feeder] client connected');
+  socket.on('message', (data) => {
+    try {
+      const obj = JSON.parse(data.toString());
+      // Re-broadcast any well-formed JSON as-is to all listeners
+      broadcast(obj);
+    } catch {
+      // ignore non-JSON
+    }
+  });
+});

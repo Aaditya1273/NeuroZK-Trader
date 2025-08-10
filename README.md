@@ -156,6 +156,90 @@ docker build -f docker/mev-router.Dockerfile -t neurozk/mev-router:dev .
   ```
 - OKX tests: `npm run test:okx`
 
+## Example Scenario
+
+Goal: Let a trading bot place orders for 1 hour using your smart account, while you keep ownership and recovery controls. Off‑chain, use OKX API to place market/limit orders with clear error handling.
+
+### On‑chain: Smart Account usage
+- Contracts: `contracts/ModularSmartAccount.sol`
+- What you do:
+  1. Deploy the smart account with your owner EVM key and an EntryPoint address (tests use a dummy `MinimalEntryPoint`).
+  2. Add a temporary “session key” for your bot for 1 hour.
+  3. Bot acts using its session key (only while valid).
+  4. You can revoke the session key anytime or recover ownership via a guardian.
+
+- Example flow (as in `test/ModularSmartAccount.test.ts`):
+  - Add a session key:
+    - `msa.addSessionKey(sessionKey.address, 3600 * 1000)` emits `SessionKeyAdded`.
+  - Validate:
+    - `msa.isSessionKeyValid(sessionKey.address)` returns `true` until expiry.
+  - Revoke:
+    - `msa.revokeSessionKey(sessionKey.address)` emits `SessionKeyRevoked`, and `isSessionKeyValid` returns `false`.
+  - Social recovery:
+    - A guardian calls `msa.recoverOwner(newOwner)` to change ownership, emitting `OwnerRecovered`.
+
+- Commands (terminal):
+  - Compile/tests:
+    ```bash
+    npm run test:contracts:ts
+    ```
+
+### Off‑chain: Trading with OKX
+- Client tests: `tests/okx/*.test.ts`
+- What you do:
+  1. Put OKX API credentials in `.env`:
+     ```env
+     OKX_API_KEY=...
+     OKX_API_SECRET=...
+     OKX_PASSPHRASE=...
+     OKX_BASE_URL=https://www.okx.com   # or demo URL
+     ```
+  2. Run tests that verify:
+     - Signed headers are attached correctly.
+     - Market/limit order params are validated (e.g., limit orders require `px`).
+     - API error codes are surfaced as `OkxError`.
+
+- Commands (terminal):
+  - Run OKX tests with explicit config:
+    ```bash
+    npx jest --config jest.config.js --verbose --runTestsByPath tests/okx/client.test.ts tests/okx/orders.test.ts
+    ```
+
+### What you gain
+- Secure delegation: Session keys let a bot act for a limited time without giving it full control.
+- Recovery: Guardians can recover ownership if needed.
+- Typed & tested: TypeChain for contract types, Jest for OKX flows, Hardhat for Solidity tests.
+- Headless workflow: Everything runs from the terminal; no UI required.
+
+### Quick commands recap
+- Contracts (TS tests): `npm run test:contracts:ts`
+- Single contract test: `npx hardhat test test/ModularSmartAccount.test.ts --show-stack-traces --bail`
+- OKX tests: `npx jest --config jest.config.js --verbose --runTestsByPath tests/okx/client.test.ts tests/okx/orders.test.ts`
+
+## Live Demo (for judges)
+
+Make it visual but zero‑risk. Use local tests and a simple flow.
+
+### 1) Contracts demo (session keys & guardians)
+```bash
+npm run demo:contracts
+```
+Shows: add/revoke session key, owner recovery event, and validations.
+
+### 2) OKX client demo (signed requests, orders)
+```bash
+npm run demo:okx
+```
+Shows: signed headers, market/limit order validation, and error handling.
+
+### 3) Optional: live dashboard
+- Start feeder: `npm run ws:feeder` (ws://localhost:8080)
+- Start frontend: `cd frontend/dashboard && npm run dev`
+
+Tips:
+- For real networks, set `SEPOLIA_RPC_URL` and `DEPLOYER_KEY` in `.env`. For demos, tests are enough.
+- Never commit secrets; `.env*` is git‑ignored.
+
 ## Notes
 - Git ignores `session_keys/`, `models/`, `.env*`, build artifacts.
 - On Windows, line endings may convert to CRLF. To normalize, add `.gitattributes`:

@@ -23,6 +23,7 @@ coverage/
 !.env.local
 session_keys/
 
+
 # Frontend (Vite) environment files
 frontend/dashboard/.env
 frontend/dashboard/.env.*
