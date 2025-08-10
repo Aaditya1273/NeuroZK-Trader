@@ -47,6 +47,48 @@ sequenceDiagram
     WS-->>FE: Streamed output for UI
 ```
 
+### 🔄 Detailed Sequence (n8n‑style)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor U as User
+  participant FE as Frontend (React)
+  participant WS as WS Feeder (Node)
+  participant AI as AI Engine
+  participant ZK as ZK Prover
+  participant BC as Blockchain (RPC/EntryPoint)
+  participant EX as Exchange/Router (OKX)
+  participant CA as Cache Store
+
+  U->>FE: Enter request / Click Analyze
+  FE->>WS: Connect stream (VITE_WS_URL)
+  WS-->>FE: Live status lines
+
+  FE->>CA: Check cache(key)
+  alt Cache Hit
+    CA-->>FE: Cached analysis
+    FE-->>U: Display results
+  else Cache Miss
+    CA-->>FE: MISS
+    FE->>AI: Build trade intent + context
+    AI->>ZK: Generate proof (policy/limits)
+    ZK-->>AI: Proof + public inputs
+    AI-->>FE: Intent + Proof
+
+    FE->>BC: Create UserOp (session key)
+    BC-->>FE: Validate via EntryPoint
+    FE->>EX: Submit route (private relay)
+    EX-->>FE: Tx / order result
+
+    FE->>CA: Store analysis (TTL)
+    CA-->>FE: OK
+    FE-->>U: Display results
+  end
+
+  note over FE,WS: Terminal panel shows monospace output with red "LIVE" indicator
+```
+
 ### 🧭 Module Map
 
 ```mermaid
