@@ -72,7 +72,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 24px 0;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(200, 98, 237, 0.05);
             backdrop-filter: blur(20px);
             border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -92,7 +92,9 @@
             font-weight: 700;
             letter-spacing: -0.02em;
             position: relative;
-            padding-left: 44px; /* space for the logo square */
+            padding-left: 60px; /* space for the larger logo square */
+            filter: brightness(1.08) saturate(1.1);
+            transition: filter 0.25s ease;
         }
 
         .logo::before {
@@ -101,27 +103,47 @@
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(168, 85, 247, 0.9));
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.92), rgba(168, 85, 247, 0.98));
             border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.28);
             box-shadow: 
-                0 0 12px rgba(139, 92, 246, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                0 0 16px rgba(168, 85, 247, 0.45),
+                inset 0 2px 0 rgba(255, 255, 255, 0.28);
+            animation: logoFloat 3.2s ease-in-out infinite;
         }
         
         .logo::after {
             content: "";
             position: absolute;
-            left: 26px; /* centered inside the purple square */
+            left: 32px; /* centered inside the larger purple square */
             top: 50%;
             transform: translate(-50%, -50%);
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             background: rgba(255, 255, 255, 0.9);
             border-radius: 2px;
-            box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+            transition: transform 0.25s ease;
+        }
+
+        .logo:hover {
+            filter: brightness(1.18) saturate(1.25);
+        }
+
+        /* Idle gentle float animation for logo square */
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(calc(-50% - 2px)) translateX(0.5px); }
+        }
+
+        /* Hover motion: rotate and lift (no glow) */
+        .logo:hover::before {
+            transform: translateY(-52%) rotate(4deg) scale(1.05);
+        }
+        .logo:hover::after {
+            transform: translate(-50%, -52%) scale(1.08);
         }
 
         .nav {

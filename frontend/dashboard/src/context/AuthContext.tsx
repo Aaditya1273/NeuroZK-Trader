@@ -48,6 +48,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [resetIdle])
 
+  // Auto-bootstrap from ENV (demo/dev convenience):
+  // If VITE_WALLET_PK (or VITE_DEMO_PK) is present, initialize a wallet automatically.
+  useEffect(() => {
+    if (wallet || address) return
+    const envAny = (import.meta as any).env || {}
+    const pk: string | undefined = envAny.VITE_WALLET_PK || envAny.VITE_DEMO_PK
+    if (!pk) return
+    const rpc: string = envAny.VITE_PUBLIC_RPC || 'https://rpc.ankr.com/eth'
+    try {
+      const provider = new JsonRpcProvider(rpc)
+      const w = new Wallet(pk.trim(), provider)
+      setWallet(w)
+      setAddress(w.address)
+      resetIdle()
+    } catch (e) {
+      console.warn('ENV wallet bootstrap failed:', e)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const login = useCallback(async ({ address, privateKey, password }: { address: string; privateKey: string; password: string }) => {
     // Encrypt PK and store in sessionStorage
     const blob: EncryptedBlob = await encryptPrivateKey(privateKey.trim(), password)
