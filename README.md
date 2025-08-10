@@ -168,7 +168,7 @@ flowchart LR
    - Guardians can rotate ownership; session keys are revocable/time‑bounded.
 
 
-## Example Scenario
+## 🕵️Example Scenario
 
 Goal: Let a trading bot place orders for 1 hour using your smart account, while you keep ownership and recovery controls. Off‑chain, use OKX API to place market/limit orders with clear error handling.
 
@@ -217,7 +217,7 @@ Goal: Let a trading bot place orders for 1 hour using your smart account, while 
     npx jest --config jest.config.js --verbose --runTestsByPath tests/okx/client.test.ts tests/okx/orders.test.ts
     ```
 
-### What you gain
+### 💎What you gain
 - Secure delegation: Session keys let a bot act for a limited time without giving it full control.
 - Recovery: Guardians can recover ownership if needed.
 - Typed & tested: TypeChain for contract types, Jest for OKX flows, Hardhat for Solidity tests.
