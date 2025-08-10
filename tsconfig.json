@@ -20,6 +20,7 @@
     "./tests/**/*",
     "./test/**/*",
     "./scripts/**/*",
-    "./contracts/**/*"
+    "./contracts/**/*",
+    "./typechain-types/**/*"
   ]
 }

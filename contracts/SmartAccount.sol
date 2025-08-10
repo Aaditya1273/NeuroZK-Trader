@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "@account-abstraction/contracts/core/BaseAccount.sol";
-import "@account-abstraction/contracts/core/EntryPoint.sol";
+import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 
 /**
  * @title SmartAccount
@@ -12,6 +14,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * This contract is modular to allow for future upgrades.
  */
 contract SmartAccount is BaseAccount, Ownable {
+    using ECDSA for bytes32;
     // Mapping from session key to its expiration timestamp
     mapping(address => uint256) public sessionKeys;
 
@@ -23,41 +26,30 @@ contract SmartAccount is BaseAccount, Ownable {
     event RecoveryKeyAdded(address indexed recoveryKey);
     event RecoveryKeyRevoked(address indexed recoveryKey);
 
-    constructor(EntryPoint anEntryPoint, address initialOwner) BaseAccount(anEntryPoint) Ownable(initialOwner) {}
+    IEntryPoint private immutable _ep;
 
-    /**
-     * @dev The core logic of the account, handling validation and execution of user operations.
-     */
-    function _validateAndExecute(
-        UserOperation calldata userOp,
-        bytes32 userOpHash,
-        uint256 missingAccountFunds
-    ) internal override onlyEntryPoint {
-        _validateSignature(userOp, userOpHash);
+    constructor(IEntryPoint anEntryPoint, address initialOwner) Ownable(initialOwner) {
+        _ep = anEntryPoint;
+    }
 
-        if (missingAccountFunds != 0) {
-            (bool success, ) = payable(entryPoint()).call{value: missingAccountFunds}("");
-            require(success, "Failed to pay missing funds");
-        }
-
-        _execute(userOp.callData, userOp.callGasLimit);
+    function entryPoint() public view override returns (IEntryPoint) {
+        return _ep;
     }
 
     /**
      * @dev Validates the signature of a user operation.
      */
-    function _validateSignature(UserOperation calldata userOp, bytes32 userOpHash) internal view override {
+    function _validateSignature(PackedUserOperation calldata userOp, bytes32 userOpHash) internal view override returns (uint256) {
         bytes32 hash = getMessageHash(userOpHash);
         address recoveredSigner = hash.recover(userOp.signature);
-
-        require(recoveredSigner == owner() || sessionKeys[recoveredSigner] > block.timestamp, "Invalid signature or session key");
+        return (recoveredSigner == owner() || sessionKeys[recoveredSigner] > block.timestamp) ? 0 : 1;
     }
 
     /**
      * @dev Executes a transaction from the account.
      */
-    function _execute(bytes memory _calldata, uint256 _gasLimit) internal {
-        (bool success, bytes memory result) = address(this).call{gas: _gasLimit}(_calldata);
+    function _execute(bytes memory _calldata) internal {
+        (bool success, bytes memory result) = address(this).call(_calldata);
         if (!success) {
             assembly {
                 revert(add(result, 32), mload(result))

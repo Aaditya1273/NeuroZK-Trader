@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
+import "@account-abstraction/contracts/interfaces/PackedUserOperation.sol";
 
 /**
  * @title ModularSmartAccount
@@ -30,8 +31,23 @@ contract ModularSmartAccount is BaseAccount, Ownable {
     event GuardianRemoved(address indexed guardian);
     event OwnerRecovered(address indexed byGuardian, address indexed newOwner);
 
+    // ============ Modifiers ============
+    modifier onlyEntryPointOrOwner() {
+        require(msg.sender == address(entryPoint()) || msg.sender == owner(), "SmartAccount: not authorized");
+        _;
+    }
+
+    // ============ EntryPoint storage ============
+    IEntryPoint private immutable _ep;
+
     // ============ Constructor ============
-    constructor(IEntryPoint _entryPoint, address _initialOwner) BaseAccount(_entryPoint) Ownable(_initialOwner) {}
+    constructor(IEntryPoint _entryPoint, address _initialOwner) Ownable(_initialOwner) {
+        _ep = _entryPoint;
+    }
+
+    function entryPoint() public view override returns (IEntryPoint) {
+        return _ep;
+    }
 
     // ============ ERC-4337: validateUserOp ============
     /**
@@ -39,13 +55,15 @@ contract ModularSmartAccount is BaseAccount, Ownable {
      * Returns validationData: 0 on success, or packed failure/validAfter/validUntil per ERC-4337
      */
     function validateUserOp(
-        UserOperation calldata userOp,
+        PackedUserOperation calldata userOp,
         bytes32 userOpHash,
         uint256 missingAccountFunds
-    ) external override onlyEntryPoint returns (uint256 validationData) {
+    ) external override returns (uint256 validationData) {
+        _requireFromEntryPoint();
+        
         // Validate signature (owner or non-expired session key)
         if (!_isValidSig(userOp.signature, userOpHash)) {
-            return SIG_VALIDATION_FAILED; // non-zero indicates invalid
+            return 1; // SIG_VALIDATION_FAILED per ERC-4337 (non-zero indicates invalid)
         }
 
         // Top up funds at EntryPoint if needed
@@ -57,11 +75,25 @@ contract ModularSmartAccount is BaseAccount, Ownable {
     }
 
     // ============ Public entry points for execution (via EntryPoint) ============
-    function execute(address target, uint256 value, bytes calldata data) external onlyEntryPoint {
+    function execute(address target, uint256 value, bytes calldata data) external override {
+        _requireFromEntryPoint();
         _call(target, value, data);
     }
 
-    function executeBatch(address[] calldata targets, uint256[] calldata values, bytes[] calldata datas) external onlyEntryPoint {
+    function executeBatch(address[] calldata targets, uint256[] calldata values, bytes[] calldata datas) external {
+        _requireFromEntryPoint();
+        require(targets.length == values.length && values.length == datas.length, "SmartAccount: length mismatch");
+        for (uint256 i = 0; i < targets.length; i++) {
+            _call(targets[i], values[i], datas[i]);
+        }
+    }
+
+    // ============ Direct execution for owner (bypasses EntryPoint) ============
+    function executeByOwner(address target, uint256 value, bytes calldata data) external onlyOwner {
+        _call(target, value, data);
+    }
+
+    function executeBatchByOwner(address[] calldata targets, uint256[] calldata values, bytes[] calldata datas) external onlyOwner {
         require(targets.length == values.length && values.length == datas.length, "SmartAccount: length mismatch");
         for (uint256 i = 0; i < targets.length; i++) {
             _call(targets[i], values[i], datas[i]);
@@ -111,12 +143,20 @@ contract ModularSmartAccount is BaseAccount, Ownable {
 
     // ============ Internal helpers ============
     function _isValidSig(bytes calldata signature, bytes32 userOpHash) internal view returns (bool) {
-        // ERC-191 digest hash (per AA reference accounts)
-        bytes32 digest = ECDSA.toEthSignedMessageHash(userOpHash);
+        // ERC-191 digest hash
+        bytes32 digest = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", userOpHash));
         address signer = ECDSA.recover(digest, signature);
         if (signer == owner()) return true;
         if (isSessionKeyValid(signer)) return true;
         return false;
+    }
+
+    // BaseAccount hook implementation
+    function _validateSignature(
+        PackedUserOperation calldata userOp,
+        bytes32 userOpHash
+    ) internal view override returns (uint256) {
+        return _isValidSig(userOp.signature, userOpHash) ? 0 : 1;
     }
 
     function _call(address target, uint256 value, bytes calldata data) internal {

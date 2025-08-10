@@ -11,23 +11,32 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^24.2.1",
     "axios": "^1.11.0",
     "circomlib": "^2.0.5",
     "circomlibjs": "^0.1.7",
     "dotenv": "^17.2.1",
+    "mocha": "^10.2.0",
     "hardhat": "^2.26.2",
     "jest": "^29.7.0",
     "nock": "^14.0.9",
     "snarkjs": "^0.7.5",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
     "typescript": "^5.9.2"
   },
   "dependencies": {
     "@account-abstraction/contracts": "^0.8.0",
     "@openzeppelin/contracts": "^5.4.0",
     "erc4337": "^0.0.1-security"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "<rootDir>/test/"
+    ]
   }
 }

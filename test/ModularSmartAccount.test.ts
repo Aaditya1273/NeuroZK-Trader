@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import type { ModularSmartAccount } from "../typechain-types";
 
 describe("ModularSmartAccount", function () {
   it("should add/revoke session keys and validate", async () => {
@@ -10,7 +11,10 @@ describe("ModularSmartAccount", function () {
     await entryPoint.waitForDeployment();
 
     const MSA = await ethers.getContractFactory("ModularSmartAccount");
-    const msa = await MSA.deploy(await entryPoint.getAddress(), owner.address);
+    const msa = (await MSA.deploy(
+      await entryPoint.getAddress(),
+      owner.address
+    )) as unknown as ModularSmartAccount;
     await msa.waitForDeployment();
 
     // Initially invalid
@@ -35,7 +39,10 @@ describe("ModularSmartAccount", function () {
     await entryPoint.waitForDeployment();
 
     const MSA = await ethers.getContractFactory("ModularSmartAccount");
-    const msa = await MSA.deploy(await entryPoint.getAddress(), owner.address);
+    const msa = (await MSA.deploy(
+      await entryPoint.getAddress(),
+      owner.address
+    )) as unknown as ModularSmartAccount;
     await msa.waitForDeployment();
 
     // Add guardian

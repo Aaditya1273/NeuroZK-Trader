@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.28;
 
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
-contract MockEntryPoint is IEntryPoint {
+abstract contract MockEntryPoint is IEntryPoint {
     // Minimal stub to satisfy type; functions revert if called
     receive() external payable {}
 

@@ -20,6 +20,7 @@ coverage/
 .env
 .env.*
 !.env.examples
+!.env.local
 session_keys/
 
 # Frontend (Vite) environment files
