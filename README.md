@@ -56,7 +56,7 @@ sequenceDiagram
     WS-->>FE: Streamed output for UI
 ```
 
-### 🔄 Detailed Sequence (n8n‑style)
+### 🔄 Detailed Sequence 
 
 ```mermaid
 sequenceDiagram
