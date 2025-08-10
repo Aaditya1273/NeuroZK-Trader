@@ -26,4 +26,7 @@ module.exports = {
     outDir: "typechain-types",
     target: "ethers-v6",
   },
+  mocha: {
+    require: ["ts-node/register/transpile-only"],
+  },
 };

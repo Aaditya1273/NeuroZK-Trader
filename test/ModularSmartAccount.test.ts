@@ -6,13 +6,15 @@ describe("ModularSmartAccount", function () {
   it("should add/revoke session keys and validate", async () => {
     const [owner, guardian, sessionKey, newOwner] = await ethers.getSigners();
 
-    const MockEntryPoint = await ethers.getContractFactory("MockEntryPoint");
-    const entryPoint = await MockEntryPoint.deploy();
-    await entryPoint.waitForDeployment();
+    // Deploy a minimal dummy EntryPoint for constructor dependency
+    const EPFactory = await ethers.getContractFactory("MinimalEntryPoint");
+    const ep = await EPFactory.deploy();
+    await ep.waitForDeployment();
+    const entryPoint = await ep.getAddress();
 
     const MSA = await ethers.getContractFactory("ModularSmartAccount");
     const msa = (await MSA.deploy(
-      await entryPoint.getAddress(),
+      entryPoint,
       owner.address
     )) as unknown as ModularSmartAccount;
     await msa.waitForDeployment();
@@ -34,13 +36,14 @@ describe("ModularSmartAccount", function () {
   it("should manage guardians and recover owner", async () => {
     const [owner, guardian, newOwner] = await ethers.getSigners();
 
-    const MockEntryPoint = await ethers.getContractFactory("MockEntryPoint");
-    const entryPoint = await MockEntryPoint.deploy();
-    await entryPoint.waitForDeployment();
+    const EPFactory = await ethers.getContractFactory("MinimalEntryPoint");
+    const ep = await EPFactory.deploy();
+    await ep.waitForDeployment();
+    const entryPoint = await ep.getAddress();
 
     const MSA = await ethers.getContractFactory("ModularSmartAccount");
     const msa = (await MSA.deploy(
-      await entryPoint.getAddress(),
+      entryPoint,
       owner.address
     )) as unknown as ModularSmartAccount;
     await msa.waitForDeployment();
