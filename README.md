@@ -251,3 +251,107 @@ Tips:
   *.yml text eol=lf
   *.py text eol=lf
   ```
+
+---
+
+## Pro Guide: Architecture, Workflow & Ops
+
+This section distills how the pieces fit together, the end‑to‑end developer workflow, and operational best practices.
+
+### System Architecture (High‑level)
+
+- __Contracts (`contracts/`)__
+  - `ModularSmartAccount.sol`: ERC‑4337 smart account with session keys and guardians for recovery.
+  - EntryPoint (tests use `MinimalEntryPoint`) for `UserOperation` validation/execution.
+- __ZK Circuits (`zk/`)__
+  - Circom circuits validate trade constraints without revealing model internals.
+- __AI (`ai/`)__
+  - Signal generation and backtesting. Produces intents + constraints for verification.
+- __OKX Client (`tests/okx`, `scripts/okx`)__
+  - Signed REST requests, validation, and order helpers.
+- __Feeder (`scripts/ws/`)__
+  - Pipes CLI/Hardhat output to WebSocket for live dashboard consumption.
+- __Frontend (`frontend/dashboard/`)__
+  - Vite + React. Live terminal‑style analysis view, wallet panels, and health cards.
+
+Data & control flow:
+1) AI emits a signal → 2) Build a trade intent → 3) Prove constraints (ZK) → 4) Create `UserOperation` with a session key → 5) Submit via bundler/relay → 6) Execute swap → 7) Stream logs/health to dashboard via WS.
+
+### Workflow (Dev to Demo)
+
+1. __Install & Build__
+   - Root deps: `npm install`
+   - Frontend: `cd frontend/dashboard && npm install`
+
+2. __Environment__
+   - Root `.env` (or `.env.local`): RPC, keys, OKX creds, WS settings.
+   - Frontend `frontend/dashboard/.env.local` for UI runtime (Vite uses `VITE_` prefix):
+     - `VITE_PUBLIC_RPC` – RPC endpoint for the UI provider.
+     - `VITE_WALLET_PK` (dev only) – enables auto‑wallet boot in the browser; address appears without clicking Connect.
+     - `VITE_WS_URL` – WebSocket endpoint for live logs (e.g., `ws://localhost:8090`).
+
+3. __Contracts__
+   - Compile/tests: `npx hardhat compile` / `npm run test:contracts`
+
+4. __Live Logs (WS)__
+   - Start feeder: `node scripts/ws/pipe.js --name contracts --tee -- npx hardhat test test/ModularSmartAccount.test.ts --show-stack-traces --bail`
+   - This streams real Hardhat output to WS (see terminal panel in the dashboard).
+
+5. __Frontend__
+   - `cd frontend/dashboard && npm run dev`
+   - Terminal analysis view shows a monospace `<pre>` with preserved spacing, appends new lines at bottom, auto‑scrolls, and a glowing red "LIVE" indicator.
+   - Wallet modal uses glassmorphism with neon accents and shows address/balance.
+
+### Frontend Wallet: Auto‑Connect from ENV
+
+The UI auto‑connects a wallet if env is present. In `frontend/dashboard/src/context/AuthContext.tsx` we bootstrap on load:
+
+- Looks for `VITE_WALLET_PK` (or `VITE_DEMO_PK`) and `VITE_PUBLIC_RPC`.
+- Creates an in‑memory `ethers.Wallet` bound to the provider and exposes `address`.
+- No manual Connect button required in the modal header.
+
+Dev‑only guidance:
+- Never commit real keys. Use a disposable/test key locally.
+- After editing `.env.local`, __restart__ the Vite dev server for changes to take effect.
+
+Optional read‑only mode (if you prefer not to supply a PK):
+- We can extend the UI to support `VITE_WALLET_ADDRESS` which shows balances without signer capabilities.
+
+### Environment Matrix (Root vs Frontend)
+
+- __Root `.env`__ (used by Node/Hardhat/tests):
+  - `SEPOLIA_RPC_URL`, `DEPLOYER_KEY`, `SESSION_VAULT_PASSPHRASE`, `SESSION_KEYS_DIR`, `WS_PORT`, `WS_HOST`, provider/API keys, etc.
+- __Frontend `.env.local`__ (Vite, must prefix with `VITE_`):
+  - `VITE_PUBLIC_RPC`, `VITE_WALLET_PK` (dev), `VITE_WS_URL`.
+
+### Operational Tips
+
+- __Session keys__: Scope TTL/limits; revoke on completion. Do not expose owner key to bots.
+- __Relays__: For live networks, use private relays/bundlers to reduce MEV risk.
+- __Logs__: Keep feeder isolated; sanitize secrets before streaming logs.
+- __Security__: Treat any PK in the browser as dev‑only. Use read‑only provider for production UI and sign on the server or via smart account/session keys.
+
+### Troubleshooting
+
+- __Address not showing in UI__
+  - Ensure `frontend/dashboard/.env.local` includes `VITE_PUBLIC_RPC` and `VITE_WALLET_PK`.
+  - Restart `npm run dev`. Vite won’t hot‑reload new env.
+  - Check DevTools console for: `ENV wallet bootstrap failed`.
+
+- __No live logs in dashboard__
+  - Start feeder with `scripts/ws/pipe.js` and confirm `[pipe] connected` in the terminal.
+  - Set `VITE_WS_URL` in frontend env to your feeder URL.
+
+- __Hardhat tests pass but UI balance is 0__
+  - The dev key may be unfunded. This is normal for demos.
+
+### Demo Script (10 minutes)
+
+1. Start WS feeder (contracts test). Confirm live stream in the dashboard.
+2. Show wallet modal: address auto‑appears (dev key). Session key concept recap.
+3. Highlight terminal: preserved spacing, red pulsing "LIVE" indicator, auto‑scroll.
+4. Optional: guardian/session key revoke flow via scripts.
+
+---
+
+For issues, open GitHub issues with: OS, Node version, steps, console logs, and env entries (redacted).
